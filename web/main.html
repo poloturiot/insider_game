@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insider</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .role-section, .word-section, .instructions, .timer-section {
+            margin: 20px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        .instructions {
+            font-style: italic;
+            color: #555;
+        }
+        .restart-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        input {
+            padding: 10px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .timer {
+            font-size: 24px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Insider</h1>
+    <button class="button restart-button" onclick="restartGame()">Restart</button>
+
+    <!-- Instructions -->
+    <div class="instructions" id="instructions">
+        Enter your names and see your roles when ready.
+    </div>
+
+    <!-- Name and Role assignment section -->
+    <div class="role-section" id="playerRoles">
+        <div>
+            <input type="text" id="name1" placeholder="Player 1 Name" />
+            <button class="button" onmousedown="showRole(1)" onmouseup="hideRole(1)">See Your Role</button>
+            <span class="hidden" id="role1"></span>
+        </div>
+        <div>
+            <input type="text" id="name2" placeholder="Player 2 Name" />
+            <button class="button" onmousedown="showRole(2)" onmouseup="hideRole(2)">See Your Role</button>
+            <span class="hidden" id="role2"></span>
+        </div>
+        <div>
+            <input type="text" id="name3" placeholder="Player 3 Name" />
+            <button class="button" onmousedown="showRole(3)" onmouseup="hideRole(3)">See Your Role</button>
+            <span class="hidden" id="role3"></span>
+        </div>
+        <div>
+            <input type="text" id="name4" placeholder="Player 4 Name" />
+            <button class="button" onmousedown="showRole(4)" onmouseup="hideRole(4)">See Your Role</button>
+            <span class="hidden" id="role4"></span>
+        </div>
+    </div>
+
+    <!-- Master reveals themselves -->
+    <div class="role-section">
+        <button class="button hidden" id="revealMasterBtn" onclick="revealMaster()">Reveal Master</button>
+        <div id="masterReveal" class="hidden"></div>
+    </div>
+
+    <!-- Secret word section -->
+    <div class="word-section hidden" id="wordSection">
+        <h2>See the Secret Word</h2>
+        <button class="button" id="seeSecretWordBtn" onmousedown="showSecretWord()" onmouseup="hideSecretWord()">See the Secret Word</button>
+        <div id="wordDisplay" class="hidden"></div>
+    </div>
+
+    <!-- Timer Section -->
+    <div class="timer-section hidden" id="timerSection">
+        <h2>Game Timer</h2>
+        <button class="button" id="startTimerBtn" onclick="startTimer()">Start Timer</button>
+        <div id="timerDisplay" class="timer">05:00</div>
+    </div>
+
+    <script>
+        let roles = ["Master", "Insider", "Commoner", "Commoner"];
+        let players = [];
+        let randomWord = '';
+        let timerInterval;
+        let totalTime = 300; // 5 minutes in seconds
+
+        window.onload = function () {
+            assignRoles();
+            generateWord();
+        };
+
+        function assignRoles() {
+            players = roles.sort(() => Math.random() - 0.5);
+            document.getElementById('revealMasterBtn').classList.remove('hidden');
+        }
+
+        function showRole(playerNumber) {
+            document.getElementById(`role${playerNumber}`).textContent = players[playerNumber - 1];
+            document.getElementById(`role${playerNumber}`).classList.remove('hidden');
+        }
+
+        function hideRole(playerNumber) {
+            document.getElementById(`role${playerNumber}`).classList.add('hidden');
+        }
+
+        function revealMaster() {
+            let masterIndex = players.indexOf('Master') + 1;
+            let playerName = document.getElementById(`name${masterIndex}`).value || `Player ${masterIndex}`;
+            document.getElementById('masterReveal').innerHTML = `${playerName} is the Master.`;
+            document.getElementById('masterReveal').classList.remove('hidden');
+            document.getElementById('wordSection').classList.remove('hidden');
+            document.getElementById('timerSection').classList.remove('hidden');
+            document.getElementById('revealMasterBtn').classList.add('hidden');
+        }
+
+        // Generate a truly random word
+        function generateWord() {
+            fetch('https://random-word-api.herokuapp.com/word?number=1')
+                .then(response => response.json())
+                .then(data => {
+                    randomWord = data[0];
+                })
+                .catch(() => {
+                    document.getElementById('wordDisplay').innerHTML = 'Error: Could not fetch a random word. Please try again later.';
+                });
+        }
+
+
+        function showSecretWord() {
+            let wordDisplay = document.getElementById('wordDisplay');
+            wordDisplay.innerHTML = `The secret word is: <strong>${randomWord}</strong>`;
+            wordDisplay.classList.remove('hidden');
+        }
+
+        function hideSecretWord() {
+            document.getElementById('wordDisplay').classList.add('hidden');
+        }
+
+        // Start the 5-minute countdown timer
+        function startTimer() {
+            clearInterval(timerInterval);
+            let timerDisplay = document.getElementById('timerDisplay');
+            totalTime = 300; // Reset to 5 minutes
+            timerInterval = setInterval(function () {
+                let minutes = Math.floor(totalTime / 60);
+                let seconds = totalTime % 60;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerDisplay.innerHTML = `${minutes}:${seconds}`;
+                totalTime--;
+
+                if (totalTime < 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.innerHTML = 'Time\'s up!';
+                }
+            }, 1000);
+        }
+
+        function restartGame() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
