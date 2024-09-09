@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Reveal - Insider</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Master Reveal</h1>
+    <p>The Master is:</p>
+    <div id="masterDisplay" style="font-size: 24px; font-weight: bold;"></div>
+    <button class="button" onclick="nextPage()">Next</button>
+    <button class="button" onclick="newGame()">New Game</button>
+    
+    <script>
+        function revealMaster() {
+            const roles = JSON.parse(localStorage.getItem('roles'));
+            const masterIndex = roles.indexOf("Master");
+            const players = JSON.parse(localStorage.getItem('players'));
+            document.getElementById('masterDisplay').textContent = players[masterIndex];
+        }
+
+        function nextPage() {
+            window.location.href = 'secret.html'; // Navigate to the secret word page
+        }
+
+        function newGame() {
+            localStorage.clear(); // Clear local storage to reset the game
+            window.location.href = 'index.html'; // Go back to the start page
+        }
+
+        window.onload = revealMaster;
+    </script>
+</body>
+</html>

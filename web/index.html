@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insider - Start</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Insider</h1>
+    <p>Click the button to assign roles and continue to the players' pages.</p>
+    <button class="button" onclick="assignRoles()">Assign Roles & Continue</button>
+    
+    <script>
+        function assignRoles() {
+            const roles = ["Master", "Insider", "Commoner", "Commoner"];
+            const shuffledRoles = roles.sort(() => Math.random() - 0.5);
+            localStorage.setItem('roles', JSON.stringify(shuffledRoles));
+            localStorage.setItem('players', JSON.stringify(["Player 1", "Player 2", "Player 3", "Player 4"]));
+            window.location.href = 'player.html?page=1'; // Navigate to Player 1's page
+        }
+    </script>
+</body>
+</html>

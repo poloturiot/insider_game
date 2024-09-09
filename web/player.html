@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player - Insider</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        #roleDisplay {
+            font-size: 24px;
+            font-weight: bold;
+            display: none;
+        }
+        #nextButton {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Player</h1>
+    <button class="button" id="seeRoleButton" onmousedown="showRole()" onmouseup="hideRole()">See Your Role</button>
+    <div id="roleDisplay"></div>
+    <button id="nextButton" class="button" onclick="nextPage()">Next</button>
+    <button class="button" onclick="newGame()">New Game</button>
+    
+    <script>
+        let roleSeen = false;
+
+        function getParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function showRole() {
+            const roles = JSON.parse(localStorage.getItem('roles'));
+            const playerIndex = parseInt(getParameter('page')) - 1;
+            const role = roles[playerIndex];
+            document.getElementById('roleDisplay').textContent = role;
+            document.getElementById('roleDisplay').style.display = 'block';
+        }
+
+        function hideRole() {
+            document.getElementById('roleDisplay').style.display = 'none';
+            if (!roleSeen) {
+                document.getElementById('nextButton').style.display = 'inline-block'; // Show the "Next" button
+                roleSeen = true;
+            }
+        }
+
+        function nextPage() {
+            const currentPage = parseInt(getParameter('page'));
+            if (currentPage < 4) {
+                window.location.href = `player.html?page=${currentPage + 1}`; // Navigate to the next player page
+            } else {
+                window.location.href = 'master.html'; // Navigate to the Master reveal page
+            }
+        }
+
+        function newGame() {
+            localStorage.clear(); // Clear local storage to reset the game
+            window.location.href = 'index.html'; // Go back to the start page
+        }
+    </script>
+</body>
+</html>
