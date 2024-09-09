@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 Players Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .role-section, .word-section, .instructions {
+            margin: 20px 0;
+        }
+        .button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .visible {
+            display: block;
+        }
+        .instructions {
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>4 Players Game</h1>
+
+    <!-- Instructions -->
+    <div class="instructions" id="instructions">
+        Click the "Assign Roles" button to start.
+    </div>
+
+    <!-- Role assignment section -->
+    <div class="role-section">
+        <h2>Assign Roles</h2>
+        <button class="button" onclick="assignRoles()">Assign Roles</button>
+        <div id="playerRoles"></div>
+    </div>
+
+    <!-- Master reveals themselves -->
+    <div class="role-section">
+        <button class="button hidden" id="revealMasterBtn" onclick="revealMaster()">Reveal Master</button>
+        <div id="masterReveal" class="hidden"></div>
+    </div>
+
+    <!-- Word generation section -->
+    <div class="word-section hidden" id="wordSection">
+        <h2>Generate Word</h2>
+        <button class="button" onclick="generateWord()">Generate Word</button>
+        <div id="wordDisplay" class="hidden"></div>
+    </div>
+
+    <script>
+        // Player roles
+        let roles = ["Master", "Insider", "Commoner", "Commoner"];
+        let players = [];
+        let randomWord = '';
+
+        // Assign roles randomly to players
+        function assignRoles() {
+            // Shuffle the roles
+            players = roles.sort(() => Math.random() - 0.5);
+            
+            let playerRolesDiv = document.getElementById('playerRoles');
+            playerRolesDiv.innerHTML = '';
+
+            players.forEach((role, index) => {
+                // Create a hidden role for each player
+                playerRolesDiv.innerHTML += `<div id="player${index + 1}">Player ${index + 1}: <span class="hidden" id="role${index + 1}">${role}</span></div>`;
+                playerRolesDiv.innerHTML += `<button class="button" onclick="showRole(${index + 1})">See Your Role</button><br/>`;
+            });
+
+            document.getElementById('revealMasterBtn').classList.remove('hidden');
+            updateInstructions('Players, click "See Your Role" to view your role privately.');
+        }
+
+        // Show individual role to each player
+        function showRole(playerNumber) {
+            let roleElement = document.getElementById(`role${playerNumber}`);
+            roleElement.classList.toggle('hidden');
+        }
+
+        // Reveal master
+        function revealMaster() {
+            let masterIndex = players.indexOf('Master') + 1;
+            document.getElementById('masterReveal').innerHTML = `The Master is Player ${masterIndex}.`;
+            document.getElementById('masterReveal').classList.remove('hidden');
+            document.getElementById('wordSection').classList.remove('hidden');
+            document.getElementById('revealMasterBtn').classList.add('hidden');
+
+            updateInstructions('Master, click "Generate Word" to see the secret word.');
+        }
+
+        // Word generation and showing it to Master and Insider
+        function generateWord() {
+            const words = ["apple", "banana", "mountain", "river", "computer"];
+            randomWord = words[Math.floor(Math.random() * words.length)];
+
+            // Show word only to Master and Insider
+            let wordDisplay = document.getElementById('wordDisplay');
+            players.forEach((role, index) => {
+                if (role === 'Master' || role === 'Insider') {
+                    wordDisplay.innerHTML = `The secret word is: <strong>${randomWord}</strong> (Visible to Master and Insider)`;
+                    wordDisplay.classList.remove('hidden');
+                }
+            });
+
+            updateInstructions('Master and Insider, memorize the word. The word will disappear in 5 seconds.');
+
+            // Hide word after 5 seconds
+            setTimeout(hideWord, 5000);
+        }
+
+        // Hide the word after being shown
+        function hideWord() {
+            document.getElementById('wordDisplay').classList.add('hidden');
+            updateInstructions('The word has been hidden. Continue with the game!');
+        }
+
+        // Update instructions for players
+        function updateInstructions(message) {
+            document.getElementById('instructions').innerText = message;
+        }
+    </script>
+</body>
+</html>
